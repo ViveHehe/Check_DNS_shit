@@ -2,7 +2,7 @@ import platform
 import subprocess
 import socket
 
-def pinger(host):
+def Run_Ping(host):
     param = '-n' if platform.system().lower() == 'windows' else '-c'
     command = ['ping', param, '1', host]
     
@@ -32,7 +32,7 @@ def pinger(host):
     except Exception as e:
         return f"Error executing ping: {str(e)}"
 
-def run_nslookup(domain):
+def Run_Nslookup(domain):
     try:
         result = subprocess.run(
             ["nslookup", domain], 
@@ -49,11 +49,11 @@ def run_nslookup(domain):
         return "Error: 'nslookup' command not found on this system."
 
 def LookupCheck(target):
-    output_of_nslookup = run_nslookup(target)
-    if not ("Non-existent domain" in output_of_nslookup):
-        return True
-    else:
+    output_of_nslookup = Run_Nslookup(target)
+    if "Non-existent domain" in output_of_nslookup:
         return False
+    else:
+        return True
 
 def get_local_prefix_offline():
     try:
@@ -81,10 +81,11 @@ def main():
     all_dns_list = all_dns(IP_SEGMENT)
     for i in range(0,3,1):
         sus_ip = all_dns_list[i]
-        Is_pingable = pinger(sus_ip)
+        Is_pingable = Run_Ping(sus_ip)
+        Is_nslookup = Run_Nslookup(sus_ip)
         if (Is_pingable):
             pass
-        elif (not (Is_pingable)):
+        elif ((not (Is_pingable)) and Is_nslookup):
             Valid_dns.append(sus_ip)
             
     print(Valid_dns)
