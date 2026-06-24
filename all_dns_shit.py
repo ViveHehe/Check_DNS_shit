@@ -18,14 +18,14 @@ def pinger(host):
         full_output = (response.stdout + response.stderr).lower()
         
         if "unreachable" in full_output:
-            return 1
+            return 0
         elif "timed out" in full_output or "100% packet loss" in full_output:
-            return 1
+            return 0
         
         if response.returncode == 0:
-            return 0
-        else:
             return 1
+        else:
+            return 0
             
     except subprocess.TimeoutExpired:
         return 1
