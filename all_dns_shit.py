@@ -75,22 +75,21 @@ def get_local_prefix_offline():
         return f"Error: {e}"
     
 def all_dns(prefix_ip):
-    all_ip = ""
-    for i in range(0,256,1):
-        sus_ip = prefix_ip + "."+str(i)
-        all_ip = all_ip + "\n" + sus_ip
-    clean_str = all_ip.lstrip()
-    return clean_str
+    ip_list = []
+    for i in range(256):
+        ip_list.append(f"{prefix_ip}.{i}")
+    return ip_list
 
 def main():
     Valid_dns = []
     IP_SEGMENT = get_local_prefix_offline()
-    all_dns(IP_SEGMENT)
+    all_dns_list = all_dns(IP_SEGMENT)
     for i in range(0,3,1):
-        sus_ip = IP_SEGMENT + "."+str(i)
-        if (pinger(sus_ip) == 1):
+        sus_ip = all_dns_list[i]
+        Is_pingable = pinger(sus_ip)
+        if (Is_pingable):
             pass
-        elif (pinger(sus_ip) == 0):
+        elif (not (Is_pingable)):
             Valid_dns.append(sus_ip)
             
     print(Valid_dns)
