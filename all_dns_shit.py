@@ -32,25 +32,22 @@ def Run_Ping(host):
     except Exception as e:
         return f"Error executing ping: {str(e)}"
 
-def Run_Nslookup(domain):
+def Run_nslookup(domain):
     try:
         result = subprocess.run(
             ["nslookup", domain], 
             capture_output=True, 
-            text=True, 
-            check=True
+            text=True,
         )
-        return result.stdout
+        combined_output = result.stdout + "\n" + result.stderr
+        return combined_output
         
-    except subprocess.CalledProcessError as e:
-        error_output = e.stdout if e.stdout else e.stderr
-        return error_output
     except FileNotFoundError:
         return "Error: 'nslookup' command not found on this system."
 
 def LookupCheck(target):
-    output_of_nslookup = Run_Nslookup(target)
-    if "Non-existent domain" in output_of_nslookup:
+    output_of_nslookup = Run_nslookup(target)
+    if "Non-existent domain" in output_of_nslookup or "can't find" in output_of_nslookup.lower():
         return False
     else:
         return True
@@ -82,7 +79,7 @@ def main():
     for i in range(0,3,1):
         sus_ip = all_dns_list[i]
         Is_pingable = Run_Ping(sus_ip)
-        Is_nslookup = Run_Nslookup(sus_ip)
+        Is_nslookup = LookupCheck(sus_ip)
         if (Is_pingable):
             pass
         elif ((not (Is_pingable)) and Is_nslookup):
